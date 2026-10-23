@@ -1,0 +1,2 @@
+# php2shell is standard-library only - there is nothing to install.
+# Kept so `pip install -r requirements.txt` succeeds without surprises.

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>php2shell report - https://gojohost.net</title></head>
+<body style="margin:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a">
+<div style="max-width:880px;margin:0 auto;padding:32px 20px 64px">
+
+  <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;
+              padding:26px 28px;color:#fff;margin-bottom:22px">
+    <div style="font-size:11px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase">
+      php2shell exposure report</div>
+    <div style="font-size:24px;font-weight:700;margin:8px 0 4px">
+      https://gojohost.net</div>
+    <div style="font-size:13px;color:#cbd5e1">
+      CVE-2026-109618 &amp; CVE-2026-109619 &middot; PHP engine RCE, CVSS 9.2 &middot;
+      generated 2026-10-23 12:00</div>
+    <div style="display:flex;gap:26px;margin-top:20px;flex-wrap:wrap">
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">Verdict</div>
+        <div style="font-size:19px;font-weight:700;color:#ca8a04">UNKNOWN</div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">Risk</div>
+        <div style="font-size:19px;font-weight:700">60<span style="font-size:12px;color:#94a3b8">/100</span></div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">PHP</div>
+        <div style="font-size:19px;font-weight:700">unknown</div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">CMS</div>
+        <div style="font-size:19px;font-weight:700">WordPress</div></div>
+    </div>
+  </div>
+
+  <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 18px;
+              font-size:13px;color:#7c2d12;margin-bottom:22px">
+    <strong>Read this first.</strong> These are bugs in the PHP engine, not in the CMS or the
+    application. Application hardening cannot fix them. The only complete remediation is
+    PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 (or a vendor backport). Where patching is not
+    possible today, disable <code>session.upload_progress</code>.
+  </div>
+
+  <h2 style="font-size:17px;margin:0 0 12px">Remote findings</h2>
+  
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #ea580c;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#ea580c;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">HIGH</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-UNKNOWN</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">PHP detected but the runtime version could not be verified</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">The version is hidden or unreachable from the outside. Every PHP release back to 5.4 is affected by at least one of the two CVEs, so an unverified host must be treated as exposed until someone checks `php -v` on the box.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">PHP was detected but its version could not be determined. Version must be verified directly on the host (php -v / phpinfo / panel).</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Run `php -v` (and check the panel/container tag), then re-scan with --php-version if it is not externally visible.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#64748b;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">INFO</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-CMS-CONTEXT</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">WordPress 7.0 detected on an application-agnostic flaw</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">PHP version comes from the host image/panel, not wp-config.php. Check the base image, the container platform, or the hosting panel. Note that this is not a CMS bug: the vulnerable code is the PHP engine itself, so application-level patching will not help.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">WordPress 7.0</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Patch PHP, then confirm the CMS still runs on the new runtime.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+
+  
+  
+  
+
+  <h2 style="font-size:17px;margin:28px 0 10px">Sources</h2>
+  <ul style="font-size:13px;color:#334155;line-height:1.8">
+    <li><a href="https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities"
+           style="color:#2563eb">Huntress - Rapid Response: php2shell (2026-10-20/21)</a></li>
+    <li><a href="https://www.wiz.io/blog/php2shell-php-rce"
+           style="color:#2563eb">Wiz Research - PHP2Shell (2026-10-21)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"
+           style="color:#2563eb">GHSA-w8hw-w9fx-j79w (CVE-2026-109618)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"
+           style="color:#2563eb">GHSA-6wmf-4rv5-p3rp (CVE-2026-109619)</a></li>
+  </ul>
+  <div style="margin-top:28px;padding-top:14px;border-top:1px solid #e2e8f0;
+              font-size:11px;color:#94a3b8">
+    Scan only systems you are authorised to test. This tool fingerprints and reports;
+    it does not exploit.
+  </div>
+</div></body></html>

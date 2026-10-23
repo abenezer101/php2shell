@@ -1,0 +1,230 @@
+{
+  "tool": "php2shell-scanner",
+  "version": "1.0",
+  "generated_at": "2026-10-22T21:32:57+00:00",
+  "scan": {
+    "target": "http://127.0.0.1:8089",
+    "started_at": "2026-10-22T21:32:54+00:00",
+    "resolved_ip": "127.0.0.1",
+    "is_php": true,
+    "php_confidence": 17,
+    "php_version": "8.1.2",
+    "version_source": "X-Powered-By / Server header",
+    "server_software": "Apache/2.4.56 (Debian) ",
+    "sapi": "mod_php (likely)",
+    "cms": "WordPress",
+    "cms_version": "6.4.2",
+    "status": "VULNERABLE",
+    "status_reason": "PHP 8.1 is end-of-life and no upstream fixed release exists. The vulnerabilities affect releases back to PHP 5.4, so 8.1.2 is affected. Apply session.upload_progress.enabled=Off now, then upgrade or use a vendor/backport build. PHP shipped a minimal source backport for this branch.",
+    "findings": [
+      {
+        "id": "PHP2SHELL-CVE-2026-109618",
+        "title": "CVE-2026-109618: Upload-progress unserializer use-after-free / remote memory disclosure",
+        "severity": "CRITICAL",
+        "category": "vulnerable-php-runtime",
+        "detail": "PHP parses RFC1867 multipart requests during request startup, before normal module initialisation. Session upload-progress handling can publish a session id in PS(id); an out-of-memory error aborts the request before cleanup, leaving that pointer dangling. A later multipart request handled by the same worker can URL-encode the reclaimed heap into a PHPSESSID response cookie, disclosing live worker memory (passwords, tokens, API keys, certificates). The decoder side (BG(unserialize) bookkeeping published across a fatal allocation failure) is the memory-corruption primitive that chains with the disclosure into unauthenticated RCE.\n\nImpact: Unauthenticated remote code execution as the web worker account (validated over HTTP against mod_php with default php.ini input and memory limits, and against prefork configurations with multiple workers). Also unauthenticated, application-agnostic process-memory disclosure - works even when the application never calls session_start().",
+        "evidence": "Detected PHP 8.1.2 via X-Powered-By / Server header; fixed in PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35.",
+        "remediation": "Upgrade to PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35 (or your vendor's backport). If you cannot patch today, set session.upload_progress.enabled = Off and isolate the host behind the vendor WAF rules for this disclosure.",
+        "references": [
+          "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w",
+          "https://www.php.net/downloads.php?source=Y"
+        ]
+      },
+      {
+        "id": "PHP2SHELL-CVE-2026-109619",
+        "title": "CVE-2026-109619: Fatal-error backtrace use-after-free / OPcache type confusion",
+        "severity": "CRITICAL",
+        "category": "vulnerable-php-runtime",
+        "detail": "PHP retains the backtrace of the most recent fatal error in EG(last_fatal_error_backtrace). A fatal out-of-memory error destroys the request heap without undefining that executor-global value, so the worker keeps a pointer into the previous request's memory. If the same worker emits a diagnostic early in the next request it follows attacker-reclaimed memory. A second variant is an OPcache type confusion: an allocation failure during zend_accel_script_persist() advances the process-local CG(map_ptr_last) frontier without publishing the shared frontier, so another worker can reuse a slot for a different runtime object and shared metadata resolves to a pointer of the wrong type.\n\nImpact: Unauthenticated heap use-after-free, memory disclosure and remote code execution with web worker privileges. Demonstrated pre-auth RCE against Drupal (backtrace UAF) and WordPress (OPcache type confusion).",
+        "evidence": "Detected PHP 8.1.2 via X-Powered-By / Server header; fixed in PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35.",
+        "remediation": "Upgrade to PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35 (or your vendor's backport). If you cannot patch today, set session.upload_progress.enabled = Off and isolate the host behind the vendor WAF rules for this disclosure.",
+        "references": [
+          "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp",
+          "https://www.php.net/downloads.php?source=Y"
+        ]
+      },
+      {
+        "id": "PHP2SHELL-MITIGATE",
+        "title": "Interim mitigation available while you schedule the upgrade",
+        "severity": "MEDIUM",
+        "category": "configuration",
+        "detail": "- Disable session upload progress: session.upload_progress.enabled = Off (php.ini or per-pool php_admin_value). This removes the known abuse case and is the primary stop-gap for end-of-life branches.\n- Remove the exposure instead of hiding it: upgrade to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, or apply the vendor backport for your distribution.\n- Count multipart request starts per worker and cap the number of simultaneous unfinished uploads (php_fpm process limits, request_terminate_timeout).\n- Keep memory_limit realistic; the bug is triggered on allocation failure, so an absurdly low limit widens the trigger surface and an unlimited one removes the OOM path entirely, which is why 0/unlimited is not a recommended 'fix'.\n- Put the PHP runtime behind a WAF/CDN rule set that the vendor published for this disclosure (Cloudflare, Fastly, AWS, Google Cloud, Imperva, Akamai).\n- Isolate end-of-life PHP from the internet; never expose php-cgi (CVE-2024-4577 style argument injection also applies).\n- Rotate any secret that lived in an affected worker's memory: DB passwords, APP_KEY / salts, API keys, TLS private keys, SMTP credentials.",
+        "evidence": "PHP security advisory 2026-10-21.",
+        "remediation": "Apply the php.ini / pool changes, then restart the SAPI.",
+        "references": [
+          "https://www.php.net/index.php#2026-10-20-1"
+        ]
+      },
+      {
+        "id": "PHP2SHELL-EXPOSE-PHP",
+        "title": "PHP advertises its exact version in HTTP headers (expose_php=On)",
+        "severity": "LOW",
+        "category": "configuration",
+        "detail": "Version disclosure is not a vulnerability, but it lets an attacker pick the matching php2shell exploit chain without guessing, and it tells them when you have not patched yet.",
+        "evidence": "X-Powered-By: X-Powered-By / Server header",
+        "remediation": "Set expose_php = Off in php.ini.",
+        "references": []
+      },
+      {
+        "id": "PHP2SHELL-CMS-CONTEXT",
+        "title": "WordPress 6.4.2 detected on an application-agnostic flaw",
+        "severity": "INFO",
+        "category": "context",
+        "detail": "PHP version comes from the host image/panel, not wp-config.php. Check the base image, the container platform, or the hosting panel. Note that this is not a CMS bug: the vulnerable code is the PHP engine itself, so application-level patching will not help.",
+        "evidence": "WordPress 6.4.2",
+        "remediation": "Patch PHP, then confirm the CMS still runs on the new runtime.",
+        "references": []
+      },
+      {
+        "id": "PHP2SHELL-DETECT-GUIDANCE",
+        "title": "Post-compromise and exploitation indicators to hunt for",
+        "severity": "INFO",
+        "category": "detection-engineering",
+        "detail": "- Unusual multipart/form-data requests followed by memory-limit errors or repeated HTTP 500 responses from the same worker.\n- Unexpectedly large or malformed PHPSESSID response cookies (percent-encoded binary blobs from worker memory).\n- Unexplained PHP worker churn: workers exiting or respawning in bursts without matching request volume.\n- PHP worker (php-fpm, php-cgi, httpd, apache2) spawning sh, bash, cmd.exe, powershell.exe, python, perl, curl, wget, nc or certutil.\n- Command lines containing /dev/tcp/, mkfifo, or PHP one-liners writing a temp .php file, executing it and deleting it.\n- Recon burst straight from the web server: whoami, id, uname -a, ipconfig.",
+        "evidence": "Wiz detection guidance + Huntress process-lineage hunting advice.",
+        "remediation": "Feed these into your SIEM/EDR. If any of them fired before you patched, treat the host as compromised, image it, rotate every secret the worker could read, and rebuild from a patched image.",
+        "references": [
+          "https://www.wiz.io/blog/php2shell-php-rce",
+          "https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities",
+          "https://github.com/Neo23x0/process-watcher"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "label": "root request",
+        "url": "http://127.0.0.1:8089",
+        "status": 200,
+        "headers": {
+          "server": "Apache/2.4.56 (Debian) ",
+          "x-powered-by": "PHP/8.1.2",
+          "set-cookie": "PHPSESSID=uzb0ftuec5ihkp2k8h6z3dz4tw; path=/"
+        },
+        "note": ""
+      },
+      {
+        "label": "php indicators",
+        "url": "http://127.0.0.1:8089",
+        "status": 200,
+        "headers": {
+          "server": "Apache/2.4.56 (Debian) ",
+          "x-powered-by": "PHP/8.1.2",
+          "set-cookie": "PHPSESSID=uzb0ftuec5ihkp2k8h6z3dz4tw; path=/"
+        },
+        "note": "X-Powered-By header: PHP/8.1.2; PHPSESSID cookie issued; Body indicator: links or form actions ending in .php; Body indicator: WordPress generator meta tag; Body indicator: WordPress asset paths"
+      },
+      {
+        "label": "path probe /index.php",
+        "url": "http://127.0.0.1:8089/index.php",
+        "status": 200,
+        "headers": {
+          "server": "Apache/2.4.56 (Debian) ",
+          "x-powered-by": "PHP/8.1.2",
+          "set-cookie": "PHPSESSID=sk1r8lcbmssas3qtd83z2yo8nm; path=/"
+        },
+        "note": ""
+      },
+      {
+        "label": "multipart cookie-shape probe",
+        "url": "http://127.0.0.1:8089",
+        "status": 200,
+        "headers": {
+          "set-cookie": "PHPSESSID=e4y7on9qzr0tsduq6jijgg7298; path=/"
+        },
+        "note": ""
+      }
+    ],
+    "probes_run": 8,
+    "notes": [],
+    "verdict": "VULNERABLE",
+    "risk_score": 95
+  },
+  "codebase": {
+    "root": "/home/user/php2shell/demo/sample-app",
+    "files_scanned": 5,
+    "php_files": 1,
+    "runtimes": [
+      {
+        "path": "composer.json",
+        "line": 5,
+        "raw": "\"php\": \">=7.4\",",
+        "version": "7.4.0",
+        "kind": "composer"
+      },
+      {
+        "path": "Dockerfile",
+        "line": 2,
+        "raw": "FROM php:8.1-apache",
+        "version": "8.1.0",
+        "kind": "docker"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "line": 10,
+        "raw": "php-version: 8.1",
+        "version": "8.1.0",
+        "kind": "ci"
+      }
+    ],
+    "findings": [
+      {
+        "id": "CODE-RUNTIME-PIN",
+        "title": "3 vulnerable PHP runtime pin(s) in the code base",
+        "severity": "CRITICAL",
+        "category": "codebase",
+        "detail": "These files decide which PHP build is deployed. Changing them is the actual fix; nothing in application code prevents these CVEs.\n\nRequired moves: 7.4 (EOL); 8.1 (EOL)",
+        "evidence": "composer.json:5  \"php\": \">=7.4\",\nDockerfile:2  FROM php:8.1-apache\n.github/workflows/ci.yml:10  php-version: 8.1",
+        "remediation": "Bump the runtime pins to a fixed release and redeploy.",
+        "references": [
+          "composer.json",
+          "Dockerfile",
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "id": "CODE-UPLOAD-PROGRESS-ON",
+        "title": "session.upload_progress.enabled is explicitly On",
+        "severity": "HIGH",
+        "category": "codebase",
+        "detail": "Session upload progress is enabled in configuration. It is the exact code path behind CVE-2026-109618's memory-disclosure primitive, and PHP recommends turning it off as the stop-gap for hosts that cannot patch.",
+        "evidence": "docker/php.ini",
+        "remediation": "Set session.upload_progress.enabled = Off and restart the SAPI.",
+        "references": []
+      }
+    ]
+  },
+  "proposed_fixes": [
+    {
+      "path": "docker/php.ini",
+      "source": "rules",
+      "reason": "Deterministic: disable the session upload-progress path and pin the PHP runtime to a fixed patch release.",
+      "applied": false,
+      "backup": null,
+      "changed": true
+    },
+    {
+      "path": "composer.json",
+      "source": "llm",
+      "reason": "Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).",
+      "applied": false,
+      "backup": null,
+      "changed": true
+    },
+    {
+      "path": "Dockerfile",
+      "source": "llm",
+      "reason": "Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).",
+      "applied": false,
+      "backup": null,
+      "changed": true
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "source": "llm",
+      "reason": "Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).",
+      "applied": false,
+      "backup": null,
+      "changed": true
+    }
+  ]
+}

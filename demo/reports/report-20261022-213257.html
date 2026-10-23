@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>php2shell report - http://127.0.0.1:8089</title></head>
+<body style="margin:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a">
+<div style="max-width:880px;margin:0 auto;padding:32px 20px 64px">
+
+  <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;
+              padding:26px 28px;color:#fff;margin-bottom:22px">
+    <div style="font-size:11px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase">
+      php2shell exposure report</div>
+    <div style="font-size:24px;font-weight:700;margin:8px 0 4px">
+      http://127.0.0.1:8089</div>
+    <div style="font-size:13px;color:#cbd5e1">
+      CVE-2026-109618 &amp; CVE-2026-109619 &middot; PHP engine RCE, CVSS 9.2 &middot;
+      generated 2026-10-22 21:32</div>
+    <div style="display:flex;gap:26px;margin-top:20px;flex-wrap:wrap">
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">Verdict</div>
+        <div style="font-size:19px;font-weight:700;color:#dc2626">VULNERABLE</div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">Risk</div>
+        <div style="font-size:19px;font-weight:700">95<span style="font-size:12px;color:#94a3b8">/100</span></div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">PHP</div>
+        <div style="font-size:19px;font-weight:700">8.1.2</div></div>
+      <div><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">CMS</div>
+        <div style="font-size:19px;font-weight:700">WordPress</div></div>
+    </div>
+  </div>
+
+  <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 18px;
+              font-size:13px;color:#7c2d12;margin-bottom:22px">
+    <strong>Read this first.</strong> These are bugs in the PHP engine, not in the CMS or the
+    application. Application hardening cannot fix them. The only complete remediation is
+    PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 (or a vendor backport). Where patching is not
+    possible today, disable <code>session.upload_progress</code>.
+  </div>
+
+  <h2 style="font-size:17px;margin:0 0 12px">Remote findings</h2>
+  
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #dc2626;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#dc2626;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">CRITICAL</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-CVE-2026-109618</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">CVE-2026-109618: Upload-progress unserializer use-after-free / remote memory disclosure</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">PHP parses RFC1867 multipart requests during request startup, before normal module initialisation. Session upload-progress handling can publish a session id in PS(id); an out-of-memory error aborts the request before cleanup, leaving that pointer dangling. A later multipart request handled by the same worker can URL-encode the reclaimed heap into a PHPSESSID response cookie, disclosing live worker memory (passwords, tokens, API keys, certificates). The decoder side (BG(unserialize) bookkeeping published across a fatal allocation failure) is the memory-corruption primitive that chains with the disclosure into unauthenticated RCE.<br><br>Impact: Unauthenticated remote code execution as the web worker account (validated over HTTP against mod_php with default php.ini input and memory limits, and against prefork configurations with multiple workers). Also unauthenticated, application-agnostic process-memory disclosure - works even when the application never calls session_start().</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">Detected PHP 8.1.2 via X-Powered-By / Server header; fixed in PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35.</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Upgrade to PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35 (or your vendor&#x27;s backport). If you cannot patch today, set session.upload_progress.enabled = Off and isolate the host behind the vendor WAF rules for this disclosure.</div>
+          <div style="margin-top:8px;font-size:11px"><a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w" style="color:#2563eb;text-decoration:none">https://github.com/php/php-src/security/advisories/GHSA-w8hw</a> <a href="https://www.php.net/downloads.php?source=Y" style="color:#2563eb;text-decoration:none">https://www.php.net/downloads.php?source=Y</a></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #dc2626;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#dc2626;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">CRITICAL</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-CVE-2026-109619</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">CVE-2026-109619: Fatal-error backtrace use-after-free / OPcache type confusion</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">PHP retains the backtrace of the most recent fatal error in EG(last_fatal_error_backtrace). A fatal out-of-memory error destroys the request heap without undefining that executor-global value, so the worker keeps a pointer into the previous request&#x27;s memory. If the same worker emits a diagnostic early in the next request it follows attacker-reclaimed memory. A second variant is an OPcache type confusion: an allocation failure during zend_accel_script_persist() advances the process-local CG(map_ptr_last) frontier without publishing the shared frontier, so another worker can reuse a slot for a different runtime object and shared metadata resolves to a pointer of the wrong type.<br><br>Impact: Unauthenticated heap use-after-free, memory disclosure and remote code execution with web worker privileges. Demonstrated pre-auth RCE against Drupal (backtrace UAF) and WordPress (OPcache type confusion).</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">Detected PHP 8.1.2 via X-Powered-By / Server header; fixed in PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35.</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Upgrade to PHP 8.5.12, 8.4.27, 8.3.36, 8.2.35 (or your vendor&#x27;s backport). If you cannot patch today, set session.upload_progress.enabled = Off and isolate the host behind the vendor WAF rules for this disclosure.</div>
+          <div style="margin-top:8px;font-size:11px"><a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp" style="color:#2563eb;text-decoration:none">https://github.com/php/php-src/security/advisories/GHSA-6wmf</a> <a href="https://www.php.net/downloads.php?source=Y" style="color:#2563eb;text-decoration:none">https://www.php.net/downloads.php?source=Y</a></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #ca8a04;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#ca8a04;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">MEDIUM</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-MITIGATE</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">Interim mitigation available while you schedule the upgrade</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">- Disable session upload progress: session.upload_progress.enabled = Off (php.ini or per-pool php_admin_value). This removes the known abuse case and is the primary stop-gap for end-of-life branches.<br>- Remove the exposure instead of hiding it: upgrade to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, or apply the vendor backport for your distribution.<br>- Count multipart request starts per worker and cap the number of simultaneous unfinished uploads (php_fpm process limits, request_terminate_timeout).<br>- Keep memory_limit realistic; the bug is triggered on allocation failure, so an absurdly low limit widens the trigger surface and an unlimited one removes the OOM path entirely, which is why 0/unlimited is not a recommended &#x27;fix&#x27;.<br>- Put the PHP runtime behind a WAF/CDN rule set that the vendor published for this disclosure (Cloudflare, Fastly, AWS, Google Cloud, Imperva, Akamai).<br>- Isolate end-of-life PHP from the internet; never expose php-cgi (CVE-2024-4577 style argument injection also applies).<br>- Rotate any secret that lived in an affected worker&#x27;s memory: DB passwords, APP_KEY / salts, API keys, TLS private keys, SMTP credentials.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">PHP security advisory 2026-10-21.</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Apply the php.ini / pool changes, then restart the SAPI.</div>
+          <div style="margin-top:8px;font-size:11px"><a href="https://www.php.net/index.php#2026-10-20-1" style="color:#2563eb;text-decoration:none">https://www.php.net/index.php#2026-10-20-1</a></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #2563eb;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#2563eb;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">LOW</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-EXPOSE-PHP</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">PHP advertises its exact version in HTTP headers (expose_php=On)</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">Version disclosure is not a vulnerability, but it lets an attacker pick the matching php2shell exploit chain without guessing, and it tells them when you have not patched yet.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">X-Powered-By: X-Powered-By / Server header</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Set expose_php = Off in php.ini.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#64748b;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">INFO</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-CMS-CONTEXT</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">WordPress 6.4.2 detected on an application-agnostic flaw</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">PHP version comes from the host image/panel, not wp-config.php. Check the base image, the container platform, or the hosting panel. Note that this is not a CMS bug: the vulnerable code is the PHP engine itself, so application-level patching will not help.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">WordPress 6.4.2</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Patch PHP, then confirm the CMS still runs on the new runtime.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#64748b;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">INFO</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">PHP2SHELL-DETECT-GUIDANCE</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">Post-compromise and exploitation indicators to hunt for</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">- Unusual multipart/form-data requests followed by memory-limit errors or repeated HTTP 500 responses from the same worker.<br>- Unexpectedly large or malformed PHPSESSID response cookies (percent-encoded binary blobs from worker memory).<br>- Unexplained PHP worker churn: workers exiting or respawning in bursts without matching request volume.<br>- PHP worker (php-fpm, php-cgi, httpd, apache2) spawning sh, bash, cmd.exe, powershell.exe, python, perl, curl, wget, nc or certutil.<br>- Command lines containing /dev/tcp/, mkfifo, or PHP one-liners writing a temp .php file, executing it and deleting it.<br>- Recon burst straight from the web server: whoami, id, uname -a, ipconfig.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">Wiz detection guidance + Huntress process-lineage hunting advice.</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Feed these into your SIEM/EDR. If any of them fired before you patched, treat the host as compromised, image it, rotate every secret the worker could read, and rebuild from a patched image.</div>
+          <div style="margin-top:8px;font-size:11px"><a href="https://www.wiz.io/blog/php2shell-php-rce" style="color:#2563eb;text-decoration:none">https://www.wiz.io/blog/php2shell-php-rce</a> <a href="https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities" style="color:#2563eb;text-decoration:none">https://www.huntress.com/blog/php2shell-leaked-critical-php-</a> <a href="https://github.com/Neo23x0/process-watcher" style="color:#2563eb;text-decoration:none">https://github.com/Neo23x0/process-watcher</a></div>
+        </div>
+
+  <h2 style="font-size:17px;margin:28px 0 12px">Code base findings</h2>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #dc2626;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#dc2626;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">CRITICAL</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">CODE-RUNTIME-PIN</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">3 vulnerable PHP runtime pin(s) in the code base</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">These files decide which PHP build is deployed. Changing them is the actual fix; nothing in application code prevents these CVEs.<br><br>Required moves: 7.4 (EOL); 8.1 (EOL)</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">composer.json:5  &quot;php&quot;: &quot;&gt;=7.4&quot;,
+Dockerfile:2  FROM php:8.1-apache
+.github/workflows/ci.yml:10  php-version: 8.1</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Bump the runtime pins to a fixed release and redeploy.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-left:4px solid #ea580c;border-radius:8px;
+                    padding:16px 18px;margin-bottom:14px;background:#fff">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="background:#ea580c;color:#fff;font-size:11px;font-weight:700;
+                         letter-spacing:.06em;padding:3px 8px;border-radius:4px">HIGH</span>
+            <span style="font-family:ui-monospace,monospace;font-size:12px;color:#64748b">CODE-UPLOAD-PROGRESS-ON</span>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:6px">session.upload_progress.enabled is explicitly On</div>
+          <div style="font-size:13px;color:#334155;line-height:1.6">Session upload progress is enabled in configuration. It is the exact code path behind CVE-2026-109618&#x27;s memory-disclosure primitive, and PHP recommends turning it off as the stop-gap for hosts that cannot patch.</div>
+          <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap">docker/php.ini</pre>
+          <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:4px;font-size:13px"><strong>Remediation.</strong> Set session.upload_progress.enabled = Off and restart the SAPI.</div>
+          <div style="margin-top:8px;font-size:11px"></div>
+        </div>
+  
+        <h3 style="font-size:15px;margin:24px 0 10px">Pinned PHP runtimes</h3>
+        <table style="width:100%;border-collapse:collapse;background:#fff;
+                      border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+          <thead><tr style="background:#f8fafc;text-align:left">
+            <th style="padding:8px 10px;font-size:12px;color:#475569">Location</th>
+            <th style="padding:8px 10px;font-size:12px;color:#475569">Pin</th>
+          </tr></thead>
+          <tbody><tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">composer.json:5</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">&quot;php&quot;: &quot;&gt;=7.4&quot;,</td></tr><tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">Dockerfile:2</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">FROM php:8.1-apache</td></tr><tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">.github/workflows/ci.yml:10</td><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-family:ui-monospace,monospace;font-size:12px">php-version: 8.1</td></tr></tbody>
+        </table>
+  <h3 style="font-size:15px;margin:24px 0 10px">Remediation plan</h3><ul><li style="margin-bottom:8px;font-size:13px"><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">docker/php.ini</code> <span style="color:#64748b">(rules, proposed)</span><br><span style="color:#334155">Deterministic: disable the session upload-progress path and pin the PHP runtime to a fixed patch release.</span></li><li style="margin-bottom:8px;font-size:13px"><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">composer.json</code> <span style="color:#64748b">(llm, proposed)</span><br><span style="color:#334155">Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).</span></li><li style="margin-bottom:8px;font-size:13px"><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">Dockerfile</code> <span style="color:#64748b">(llm, proposed)</span><br><span style="color:#334155">Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).</span></li><li style="margin-bottom:8px;font-size:13px"><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">.github/workflows/ci.yml</code> <span style="color:#64748b">(llm, proposed)</span><br><span style="color:#334155">Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35).</span></li></ul>
+
+  <h2 style="font-size:17px;margin:28px 0 10px">Sources</h2>
+  <ul style="font-size:13px;color:#334155;line-height:1.8">
+    <li><a href="https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities"
+           style="color:#2563eb">Huntress - Rapid Response: php2shell (2026-10-20/21)</a></li>
+    <li><a href="https://www.wiz.io/blog/php2shell-php-rce"
+           style="color:#2563eb">Wiz Research - PHP2Shell (2026-10-21)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"
+           style="color:#2563eb">GHSA-w8hw-w9fx-j79w (CVE-2026-109618)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"
+           style="color:#2563eb">GHSA-6wmf-4rv5-p3rp (CVE-2026-109619)</a></li>
+  </ul>
+  <div style="margin-top:28px;padding-top:14px;border-top:1px solid #e2e8f0;
+              font-size:11px;color:#94a3b8">
+    Scan only systems you are authorised to test. This tool fingerprints and reports;
+    it does not exploit.
+  </div>
+</div></body></html>

@@ -1,0 +1,56 @@
+# php2shell (CVE-2026-109618 / CVE-2026-109619) remediation
+# Apply from the repository root: git apply php2shell-remediation.patch
+#
+# docker/php.ini  [rules]  Deterministic: disable the session upload-progress path and pin the PHP runtime to a fixed patch release.
+#
+--- a/docker/php.ini
++++ b/docker/php.ini
+@@ -6,7 +6,7 @@
+ 
+ ; Session settings
+ session.name = PHPSESSID
+-session.upload_progress.enabled = On
++session.upload_progress.enabled = Off
+ session.upload_progress.freq = 1%
+ session.upload_progress.min_freq = 1
+ 
+#
+# composer.json  [llm]  Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.
+#
+--- a/composer.json
++++ b/composer.json
+@@ -2,7 +2,7 @@
+   "name": "demo/sample-app",
+   "description": "Sample PHP app for the php2shell scanner demo",
+   "require": {
+-    "php": ">=7.4",
++    "php": ">=8.2.35",
+     "ext-pdo": "*",
+     "monolog/monolog": "^2.9"
+   },
+#
+# Dockerfile  [llm]  Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.
+#
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -1,5 +1,5 @@
+ # Demo project: a PHP app pinned to a vulnerable runtime.
+-FROM php:8.1-apache
++FROM php:8.2.35-apache
+ 
+ RUN docker-php-ext-install pdo pdo_mysql
+ 
+#
+# .github/workflows/ci.yml  [llm]  Deterministic remediation of the php2shell exposure: upload-progress code path disabled and/or the PHP runtime pinned to a fixed release (8.5.12 / 8.4.27 / 8.3.
+#
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -7,7 +7,7 @@
+       - uses: actions/checkout@v4
+       - uses: shivammathur/setup-php@v2
+         with:
+-          php-version: 8.1
++          php-version: 8.2.35
+           extensions: pdo, pdo_mysql
+       - run: composer install --no-interaction
+       - run: vendor/bin/phpunit

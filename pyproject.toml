@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "php2shell-scanner"
+version = "1.0.0"
+description = "Scan a domain for CVE-2026-109618 / CVE-2026-109619 exposure and fix the PHP runtime pin in your code base."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+php2shell = "php2shell.cli:main"
+
+[tool.setuptools]
+packages = ["php2shell"]

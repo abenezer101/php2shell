@@ -1,0 +1,83 @@
+{
+  "tool": "php2shell-scanner",
+  "version": "1.0",
+  "generated_at": "2026-10-23T17:00:38+00:00",
+  "scan": {
+    "target": "https://gojohost.net",
+    "started_at": "2026-10-23T16:59:58+00:00",
+    "resolved_ip": "104.21.68.153",
+    "is_php": true,
+    "php_confidence": 8,
+    "php_version": null,
+    "version_source": "",
+    "server_software": "cloudflare",
+    "sapi": "",
+    "cms": "WordPress",
+    "cms_version": "7.0",
+    "status": "UNKNOWN",
+    "status_reason": "PHP was detected but its version could not be determined. Version must be verified directly on the host (php -v / phpinfo / panel).",
+    "findings": [
+      {
+        "id": "PHP2SHELL-UNKNOWN",
+        "title": "PHP detected but the runtime version could not be verified",
+        "severity": "HIGH",
+        "category": "unverifiable",
+        "detail": "The version is hidden or unreachable from the outside. Every PHP release back to 5.4 is affected by at least one of the two CVEs, so an unverified host must be treated as exposed until someone checks `php -v` on the box.",
+        "evidence": "PHP was detected but its version could not be determined. Version must be verified directly on the host (php -v / phpinfo / panel).",
+        "remediation": "Run `php -v` (and check the panel/container tag), then re-scan with --php-version if it is not externally visible.",
+        "references": []
+      },
+      {
+        "id": "PHP2SHELL-CMS-CONTEXT",
+        "title": "WordPress 7.0 detected on an application-agnostic flaw",
+        "severity": "INFO",
+        "category": "context",
+        "detail": "PHP version comes from the host image/panel, not wp-config.php. Check the base image, the container platform, or the hosting panel. Note that this is not a CMS bug: the vulnerable code is the PHP engine itself, so application-level patching will not help.",
+        "evidence": "WordPress 7.0",
+        "remediation": "Patch PHP, then confirm the CMS still runs on the new runtime.",
+        "references": []
+      }
+    ],
+    "evidence": [
+      {
+        "label": "root request",
+        "url": "https://gojohost.net",
+        "status": 200,
+        "headers": {
+          "x-litespeed-cache": "hit",
+          "server": "cloudflare",
+          "cf-ray": "a4f24bb4ec1139db-ATL"
+        },
+        "note": ""
+      },
+      {
+        "label": "php indicators",
+        "url": "https://gojohost.net",
+        "status": 200,
+        "headers": {
+          "x-litespeed-cache": "hit",
+          "server": "cloudflare",
+          "cf-ray": "a4f24bb4ec1139db-ATL"
+        },
+        "note": "Body indicator: links or form actions ending in .php; Body indicator: WordPress generator meta tag; Body indicator: WordPress asset paths; WordPress REST/pingback headers"
+      },
+      {
+        "label": "path probe /index.php",
+        "url": "https://gojohost.net/index.php",
+        "status": 301,
+        "headers": {
+          "x-litespeed-cache": "miss",
+          "server": "cloudflare",
+          "cf-ray": "a4f24bbc395825cb-ATL"
+        },
+        "note": ""
+      }
+    ],
+    "probes_run": 2,
+    "notes": [],
+    "verdict": "UNKNOWN",
+    "risk_score": 60
+  },
+  "codebase": null,
+  "proposed_fixes": []
+}
